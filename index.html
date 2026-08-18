@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ScanCart POS & Store Inventory System</title>
-    <!-- Font Awesome for Icons -->
+    <title>ScanCart POS & Inventory Manager</title>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS DESIGN SYSTEM & VARIABLES */
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
             --primary-light: #eff6ff;
+            --primary-glow: rgba(37, 99, 235, 0.15);
             --secondary: #475569;
             --background: #f8fafc;
             --surface: #ffffff;
@@ -23,869 +27,387 @@
             --danger: #ef4444;
             --danger-light: #fef2f2;
             --warning: #f59e0b;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Plus Jakarta Sans', sans-serif;
         }
 
         [data-theme="dark"] {
             --primary: #3b82f6;
             --primary-hover: #60a5fa;
             --primary-light: #1e293b;
+            --primary-glow: rgba(59, 130, 246, 0.25);
             --secondary: #94a3b8;
-            --background: #0f172a;
-            --surface: #1e293b;
+            --background: #090d16;
+            --surface: #131c2e;
             --text: #f8fafc;
             --muted: #94a3b8;
-            --border: #334155;
-            --success: #10b981;
-            --success-light: #064e3b;
-            --danger: #f87171;
-            --danger-light: #7f1d1d;
-            --warning: #fbbf24;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+            --border: #233148;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
         }
 
-        /* BASE STYLES */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: var(--font-family);
+            font-family: var(--font);
             background-color: var(--background);
             color: var(--text);
             line-height: 1.5;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 70px;
         }
+        @media (min-width: 768px) { body { padding-bottom: 0; } }
 
-        button, input, select {
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-        }
+        button, input, select { font-family: inherit; font-size: 0.95rem; outline: none; }
+        button { cursor: pointer; border: none; background: none; }
 
-        button {
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        /* LAYOUT STRUCTURE */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Header Nav */
         header.app-header {
-            background-color: var(--surface);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 1.25rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 90;
             box-shadow: var(--shadow-sm);
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
-        .brand-area {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
+        .brand-area { display: flex; align-items: center; gap: 0.75rem; }
         .brand-logo {
-            width: 40px;
-            height: 40px;
+            width: 42px; height: 42px;
             background: linear-gradient(135deg, var(--primary), #1d4ed8);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-        }
-
-        .brand-title h1 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            line-height: 1.2;
-        }
-
-        .brand-title p {
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        /* NAV TABS (PAGE SWITCHER) */
-        .nav-tabs {
-            display: flex;
-            background: var(--background);
-            padding: 4px;
             border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.25rem;
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
+        .brand-title h1 { font-size: 1.15rem; font-weight: 800; }
+        .brand-title p { font-size: 0.75rem; color: var(--muted); }
 
+        .desktop-nav { display: none; background: var(--background); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+        @media (min-width: 768px) { .desktop-nav { display: flex; } }
+        
         .nav-tab {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--muted);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
+            padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+            color: var(--muted); display: flex; align-items: center; gap: 0.5rem; transition: var(--transition);
         }
+        .nav-tab.active { background-color: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
 
-        .nav-tab.active {
-            background-color: var(--surface);
-            color: var(--primary);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; }
         .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text);
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text); border: 1px solid var(--border); transition: var(--transition);
             background-color: var(--surface);
         }
+        .icon-btn:hover { background-color: var(--primary-light); color: var(--primary); border-color: var(--primary); }
 
-        .icon-btn:hover {
-            background-color: var(--border);
-        }
+        /* App Layout Main */
+        main.app-main { flex: 1; padding: 1.25rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
 
-        /* MAIN DASHBOARD VIEWS */
-        main.app-main {
-            flex: 1;
-            padding: 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
+        .grid-pos { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+        @media (min-width: 1024px) { .grid-pos { grid-template-columns: 1.1fr 0.9fr; } }
 
-        .view-section {
-            display: none;
-        }
+        .grid-inventory { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+        @media (min-width: 1024px) { .grid-inventory { grid-template-columns: 380px 1fr; } }
 
-        .view-section.active {
-            display: block;
-        }
-
-        .grid-pos {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-            .grid-pos {
-                grid-template-columns: 1.1fr 0.9fr;
-            }
-        }
-
-        .grid-inventory {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-            .grid-inventory {
-                grid-template-columns: 1fr 1.3fr;
-            }
-        }
-
-        /* CARDS & PANELS */
         .card {
             background-color: var(--surface);
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow);
             padding: 1.25rem;
             margin-bottom: 1.25rem;
             transition: var(--transition);
         }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .card-title { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+        .card-title i { color: var(--primary); }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* SCANNER SECTION */
+        /* Scanner Elements */
         .scanner-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            background-color: #000;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            border: 2px dashed var(--border);
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background-color: #000; border-radius: var(--radius-sm); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem; border: 2px dashed var(--border);
         }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        @media (max-width: 640px) { .scanner-container { aspect-ratio: 4/3; } }
+        video { width: 100%; height: 100%; object-fit: cover; }
         .scanner-overlay {
-            position: absolute;
-            inset: 0;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
+            position: absolute; inset: 0; border: 2px solid transparent;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
         }
-
+        .scanner-viewfinder {
+            width: 70%; height: 60%; border: 2px solid var(--primary); border-radius: 12px;
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.4); position: relative;
+        }
         .scanner-laser {
-            width: 80%;
-            height: 2px;
-            background-color: var(--danger);
-            box-shadow: 0 0 8px var(--danger);
-            position: absolute;
-            top: 50%;
-            animation: scan 2s infinite ease-in-out;
-            display: none;
+            width: 100%; height: 2px; background-color: var(--danger);
+            box-shadow: 0 0 10px var(--danger); position: absolute; top: 50%;
+            animation: scan 2s infinite ease-in-out; display: none;
         }
-
-        @keyframes scan {
-            0%, 100% { top: 20%; }
-            50% { top: 80%; }
-        }
-
+        @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
         .scanner-status {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            backdrop-filter: blur(4px);
+            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.85); color: white; padding: 0.35rem 0.9rem;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 600;
         }
 
-        .scanner-controls {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        /* BUTTONS */
+        /* Buttons & Controls */
         .btn {
-            padding: 0.625rem 1.25rem;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            width: 100%;
+            padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            transition: var(--transition); width: 100%; min-height: 46px;
         }
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-secondary { background-color: var(--background); color: var(--text); border: 1px solid var(--border); }
+        .btn-outline { border: 1px solid var(--border); color: var(--text); background: var(--surface); }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-        }
-
-        .btn-secondary {
-            background-color: var(--border);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--muted);
-            color: white;
-        }
-
-        .btn-outline {
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* SEARCH & INPUT */
-        .search-box {
-            display: flex;
-            gap: 0.5rem;
-            position: relative;
-        }
-
-        .input-group {
-            position: relative;
-            flex: 1;
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--muted);
-        }
-
+        /* Search Dropdown */
+        .search-box { display: flex; gap: 0.5rem; position: relative; }
+        .input-group { position: relative; flex: 1; }
+        .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
         .form-control {
-            width: 100%;
-            padding: 0.625rem 0.75rem 0.625rem 2.25rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background-color: var(--surface);
-            color: var(--text);
-            transition: var(--transition);
+            width: 100%; padding: 0.7rem 0.85rem 0.7rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background-color: var(--surface); color: var(--text); transition: var(--transition);
         }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
 
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.35rem;
-            color: var(--text);
-        }
-
-        /* SEARCH SUGGESTIONS DROPDOWN */
         .search-results-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg);
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 50;
-            margin-top: 4px;
-            display: none;
+            position: absolute; top: 100%; left: 0; right: 0; background: var(--surface);
+            border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+            max-height: 250px; overflow-y: auto; z-index: 50; margin-top: 6px; display: none;
         }
-
         .search-result-item {
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
+            padding: 0.85rem; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); cursor: pointer;
         }
+        .search-result-item:hover { background-color: var(--primary-light); }
 
-        .search-result-item:hover {
-            background-color: var(--primary-light);
-        }
-
-        /* PRODUCT RESULT CARD */
+        /* Scanned Product Output */
         .product-result-card {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-            background-color: var(--primary-light);
-            border: 1px solid var(--primary);
-            border-radius: var(--radius-sm);
-            animation: fadeIn 0.3s ease;
+            display: flex; flex-direction: column; gap: 1rem; padding: 1.1rem;
+            background-color: var(--primary-light); border: 1.5px solid var(--primary);
+            border-radius: var(--radius-sm); animation: fadeIn 0.3s ease;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .product-details {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
+        .product-details { display: flex; gap: 1rem; align-items: center; }
         .product-image {
-            width: 64px;
-            height: 64px;
-            border-radius: var(--radius-sm);
-            background-color: var(--surface);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            color: var(--primary);
-            border: 1px solid var(--border);
+            width: 60px; height: 60px; border-radius: var(--radius-sm);
+            background-color: var(--surface); display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: var(--primary); border: 1px solid var(--border); flex-shrink: 0;
         }
+        .product-info h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+        .product-info p { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+        .product-price { font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-top: 0.2rem; }
 
-        .product-info h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .product-info p {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .product-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-top: 0.25rem;
-        }
-
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .quantity-control { display: flex; align-items: center; gap: 0.4rem; }
         .qty-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            width: 36px; height: 36px; border-radius: 8px; background-color: var(--surface);
+            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem; color: var(--text);
         }
-
         .qty-input {
-            width: 50px;
-            text-align: center;
-            padding: 0.25rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background-color: var(--surface);
-            color: var(--text);
+            width: 50px; text-align: center; padding: 0.4rem; border: 1px solid var(--border);
+            border-radius: 8px; background-color: var(--surface); color: var(--text); font-weight: 700;
         }
 
-        /* CART LIST */
-        .cart-items {
-            max-height: 320px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
+        /* Cart Styling */
+        .cart-items { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
         .cart-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            background-color: var(--surface);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background-color: var(--surface); gap: 0.75rem;
         }
+        .cart-item-info h4 { font-size: 0.95rem; font-weight: 700; }
+        .cart-item-info p { font-size: 0.8rem; color: var(--muted); }
+        .cart-item-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .cart-item-subtotal { font-weight: 800; font-size: 1rem; text-align: right; min-width: 70px; }
 
-        .cart-item-info h4 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .cart-item-info p {
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-
-        .cart-item-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .cart-item-subtotal {
-            font-weight: 700;
-            font-size: 1rem;
-            min-width: 70px;
-            text-align: right;
-        }
-
-        /* BILLING CALCULATIONS */
         .billing-summary {
-            background-color: var(--background);
-            padding: 1rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            background-color: var(--background); padding: 1.1rem; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.6rem;
         }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-        }
-
+        .summary-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 500; }
         .summary-row.grand-total {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary);
-            border-top: 1px dashed var(--border);
-            padding-top: 0.5rem;
-            margin-top: 0.25rem;
+            font-size: 1.25rem; font-weight: 800; color: var(--primary);
+            border-top: 2px dashed var(--border); padding-top: 0.75rem; margin-top: 0.3rem;
         }
-
-        .summary-controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
+        .summary-controls { display: flex; gap: 0.75rem; margin: 0.4rem 0; }
         .summary-controls input, .summary-controls select {
-            width: 70px;
-            padding: 0.2rem 0.4rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background-color: var(--surface);
-            color: var(--text);
+            width: 75px; padding: 0.35rem 0.5rem; border: 1px solid var(--border);
+            border-radius: 6px; background-color: var(--surface); color: var(--text); font-weight: 600;
         }
 
-        /* RECENT SCANS HISTORY */
-        .recent-scans-list {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
+        /* Inventory Table */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .data-table th, .data-table td { padding: 0.85rem 0.6rem; border-bottom: 1px solid var(--border); }
+        .data-table th { color: var(--muted); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
 
-        .scan-chip {
-            padding: 0.4rem 0.75rem;
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
+        /* Mobile Bottom Controls */
+        .mobile-bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
+            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+            padding: 0.5rem 0; z-index: 100; box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
         }
-
-        .scan-chip:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+        @media (min-width: 768px) { .mobile-bottom-nav { display: none; } }
+        
+        .mobile-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+            font-size: 0.75rem; font-weight: 600; color: var(--muted); width: 50%;
         }
+        .mobile-nav-item.active { color: var(--primary); }
+        .mobile-nav-item i { font-size: 1.15rem; }
 
-        /* INVENTORY TABLE */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
+        .empty-state { text-align: center; padding: 2rem 1rem; color: var(--muted); }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.4; }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        .data-table th, .data-table td {
-            padding: 0.75rem 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-table th {
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        /* EMPTY STATES */
-        .empty-state {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: var(--muted);
-        }
-
-        .empty-state i {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.5;
-        }
-
-        /* MODALS */
+        /* Modal Overlay */
         .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s ease; backdrop-filter: blur(4px);
         }
-
-        .modal-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background: var(--surface);
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 500px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-lg);
-            max-height: 90vh;
-            overflow-y: auto;
+            background: var(--surface); border-radius: var(--radius); width: 92%; max-width: 440px;
+            padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;
         }
 
-        /* TOAST NOTIFICATIONS */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 0.5rem; }
+        @media (min-width: 768px) { .toast-container { bottom: 20px; } }
         .toast {
-            background: var(--surface);
-            color: var(--text);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            border-left: 4px solid var(--primary);
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            animation: slideIn 0.3s ease;
+            background: var(--surface); color: var(--text); padding: 0.85rem 1.1rem;
+            border-radius: var(--radius-sm); border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.75rem;
+            font-weight: 600; font-size: 0.9rem; animation: slideIn 0.3s ease;
         }
-
         .toast.success { border-color: var(--success); }
         .toast.danger { border-color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        /* PRINT STYLES */
+        /* Print Receipt Layout */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printable-receipt, #printable-receipt * {
-                visibility: visible;
-            }
+            body * { visibility: hidden; }
+            #printable-receipt, #printable-receipt * { visibility: visible; }
             #printable-receipt {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                max-width: 80mm;
-                padding: 10px;
-                font-family: monospace;
-                color: #000;
-                background: #fff;
+                position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm;
+                padding: 10px; font-family: monospace; color: #000; background: #fff;
             }
-            .no-print {
-                display: none !important;
-            }
+            .no-print { display: none !important; }
         }
-
         .receipt-header { text-align: center; margin-bottom: 1rem; }
         .receipt-divider { border-top: 1px dashed #000; margin: 0.5rem 0; }
         .receipt-table { width: 100%; text-align: left; border-collapse: collapse; }
-        .receipt-table th, .receipt-table td { padding: 2px 0; font-size: 0.85rem; }
-        .receipt-total { font-weight: bold; }
+        .receipt-table th, .receipt-table td { padding: 3px 0; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- HEADER WITH PAGE SWITCHER NAV TABS -->
+    <!-- APP HEADER -->
     <header class="app-header">
         <div class="brand-area">
-            <div class="brand-logo">
-                <i class="fa-solid fa-barcode"></i>
-            </div>
+            <div class="brand-logo"><i class="fa-solid fa-barcode"></i></div>
             <div class="brand-title">
                 <h1>ScanCart</h1>
-                <p>Smart Retail & Inventory POS</p>
+                <p>Retail Billing & Inventory</p>
             </div>
         </div>
 
-        <!-- VIEW SWITCHER (TWO PAGES) -->
-        <nav class="nav-tabs">
-            <button class="nav-tab active" id="tab-pos" data-view="pos-view">
-                <i class="fa-solid fa-cash-register"></i> POS Billing
-            </button>
-            <button class="nav-tab" id="tab-inventory" data-view="inventory-view">
-                <i class="fa-solid fa-boxes-packing"></i> Add Products / Store
-            </button>
+        <nav class="desktop-nav">
+            <button class="nav-tab active" id="tab-pos"><i class="fa-solid fa-cash-register"></i> POS Billing</button>
+            <button class="nav-tab" id="tab-inventory"><i class="fa-solid fa-boxes-packing"></i> Store Inventory</button>
         </nav>
 
         <div class="header-actions">
-            <button class="icon-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-            <button class="icon-btn" id="settings-btn" aria-label="Settings">
-                <i class="fa-solid fa-gear"></i>
-            </button>
+            <button class="icon-btn" id="theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
         </div>
     </header>
 
-    <!-- MAIN APP WRAPPER -->
+    <!-- MAIN APP VIEWS -->
     <main class="app-main">
-
-        <!-- PAGE 1: POS BILLING VIEW -->
+        <!-- POS TERMINAL VIEW -->
         <section class="view-section active" id="pos-view">
             <div class="grid-pos">
-                <!-- LEFT: CAMERA SCANNER & SEARCH -->
-                <div class="left-column">
+                <div>
+                    <!-- Camera Scanner -->
                     <div class="card">
                         <div class="card-header">
-                            <span class="card-title"><i class="fa-solid fa-camera"></i> Camera Barcode Scanner</span>
-                            <span id="camera-status-badge" style="font-size: 0.8rem; color: var(--muted);">Ready</span>
+                            <span class="card-title"><i class="fa-solid fa-camera"></i> Barcode Camera Scanner</span>
+                            <span id="camera-status-badge" style="font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:12px; background:var(--background); font-weight:700;">Off</span>
                         </div>
                         
                         <div class="scanner-container">
                             <video id="video-preview-pos" playsinline></video>
                             <div class="scanner-overlay">
+                                <div class="scanner-viewfinder"></div>
                                 <div class="scanner-laser" id="scanner-laser-pos"></div>
                             </div>
-                            <div class="scanner-status" id="scanner-status-pos">Camera Off</div>
+                            <div class="scanner-status" id="scanner-status-pos">Camera Stopped</div>
                         </div>
 
-                        <div class="scanner-controls">
-                            <button class="btn btn-primary" id="start-scanner-pos-btn">
-                                <i class="fa-solid fa-play"></i> Start Camera Scanner
-                            </button>
-                            <button class="btn btn-danger" id="stop-scanner-pos-btn" style="display:none;">
-                                <i class="fa-solid fa-stop"></i> Stop Camera
-                            </button>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+                            <button class="btn btn-primary" id="start-scanner-pos-btn"><i class="fa-solid fa-video"></i> Start Scanner</button>
+                            <button class="btn btn-danger" id="stop-scanner-pos-btn" style="display:none;"><i class="fa-solid fa-stop"></i> Stop Scanner</button>
+                            <button class="btn btn-secondary" id="switch-camera-btn"><i class="fa-solid fa-camera-rotate"></i> Switch Cam</button>
                         </div>
 
                         <div class="search-box">
                             <div class="input-group">
                                 <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="barcode-input-pos" class="form-control" placeholder="Scan or enter barcode / product name..." autocomplete="off">
+                                <input type="text" id="barcode-input-pos" class="form-control" placeholder="Scan or type barcode / product name..." autocomplete="off">
                             </div>
-                            <button class="btn btn-primary" id="search-pos-btn" style="width: auto;">Search</button>
+                            <button class="btn btn-primary" id="search-pos-btn" style="width:auto; padding:0 1.2rem;">Search</button>
                             <div class="search-results-dropdown" id="search-dropdown-pos"></div>
                         </div>
                     </div>
 
+                    <!-- Scanned Result Card -->
                     <div class="card">
-                        <div class="card-header">
-                            <span class="card-title"><i class="fa-solid fa-box"></i> Scanned Product Details</span>
-                        </div>
+                        <div class="card-header"><span class="card-title"><i class="fa-solid fa-box"></i> Scanned Item</span></div>
                         <div id="product-result-body-pos">
-                            <div class="empty-state">
-                                <i class="fa-solid fa-barcode"></i>
-                                <p>Scan a barcode to display item information.</p>
-                            </div>
+                            <div class="empty-state"><i class="fa-solid fa-barcode"></i><p>Scan a barcode to view item details.</p></div>
                         </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Scans</span>
-                            <button class="btn-outline" id="clear-history-btn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; border-radius: 4px;">Clear</button>
-                        </div>
-                        <div class="recent-scans-list" id="recent-scans-list"></div>
                     </div>
                 </div>
 
-                <!-- RIGHT: CART & BILL SUMMARY -->
-                <div class="right-column">
-                    <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+                <!-- Shopping Cart & Bill Section -->
+                <div id="cart-section-desktop">
+                    <div class="card" style="display: flex; flex-direction: column; min-height: 520px;">
                         <div class="card-header">
-                            <span class="card-title"><i class="fa-solid fa-cart-shopping"></i> Shopping Cart</span>
-                            <button class="btn-danger" id="clear-cart-btn" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; width: auto;">
-                                <i class="fa-solid fa-trash"></i> Empty
-                            </button>
+                            <span class="card-title"><i class="fa-solid fa-cart-shopping"></i> Billing Cart</span>
+                            <button class="btn-danger" id="clear-cart-btn" style="padding: 0.25rem 0.6rem; font-size: 0.8rem; width: auto;"><i class="fa-solid fa-trash"></i> Empty</button>
                         </div>
 
                         <div class="cart-items" id="cart-items-container">
-                            <div class="empty-state">
-                                <i class="fa-solid fa-basket-shopping"></i>
-                                <p>Cart is empty.</p>
-                            </div>
+                            <div class="empty-state"><i class="fa-solid fa-basket-shopping"></i><p>Cart is currently empty.</p></div>
                         </div>
 
+                        <!-- BILL CALCULATIONS & BUTTONS -->
                         <div class="billing-summary" style="margin-top: auto;">
-                            <div class="summary-row">
-                                <span>Subtotal</span>
-                                <span id="summary-subtotal">₹0.00</span>
-                            </div>
+                            <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">₹0.00</span></div>
 
                             <div class="summary-controls">
                                 <div class="summary-row" style="flex:1;">
@@ -893,34 +415,32 @@
                                     <input type="number" id="discount-input" min="0" max="100" value="0">
                                 </div>
                                 <div class="summary-row" style="flex:1;">
-                                    <span>GST Tax (%)</span>
+                                    <span>GST Tax</span>
                                     <select id="tax-select">
                                         <option value="0">0%</option>
                                         <option value="5" selected>5%</option>
                                         <option value="12">12%</option>
                                         <option value="18">18%</option>
-                                        <option value="28">28%</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="summary-row">
-                                <span>Discount Amount</span>
-                                <span id="summary-discount">-₹0.00</span>
-                            </div>
-                            <div class="summary-row">
-                                <span>Tax Amount</span>
-                                <span id="summary-tax">+₹0.00</span>
-                            </div>
+                            <div class="summary-row"><span>Discount Amount</span><span id="summary-discount">-₹0.00</span></div>
+                            <div class="summary-row"><span>GST Amount</span><span id="summary-tax">+₹0.00</span></div>
 
                             <div class="summary-row grand-total">
                                 <span>Grand Total</span>
                                 <span id="summary-grand-total">₹0.00</span>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.75rem;">
-                                <button class="btn btn-secondary" id="view-receipt-btn"><i class="fa-solid fa-file-invoice"></i> View Bill</button>
-                                <button class="btn btn-primary" id="print-receipt-btn"><i class="fa-solid fa-print"></i> Print Bill</button>
+                            <!-- PRINT & PROCEED ACTION BUTTONS -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                                <button class="btn btn-secondary" id="print-receipt-btn">
+                                    <i class="fa-solid fa-print"></i> Print Bill
+                                </button>
+                                <button class="btn btn-success" id="proceed-checkout-btn">
+                                    <i class="fa-solid fa-circle-check"></i> Proceed
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -928,189 +448,110 @@
             </div>
         </section>
 
-        <!-- PAGE 2: ADD PRODUCTS TO STORE / INVENTORY PAGE -->
+        <!-- STORE INVENTORY VIEW -->
         <section class="view-section" id="inventory-view">
             <div class="grid-inventory">
-                <!-- FORM & SCANNER TO ADD/UPDATE STORE ITEM -->
                 <div class="card">
-                    <div class="card-header">
-                        <span class="card-title"><i class="fa-solid fa-plus-circle"></i> Add / Update Product to Store</span>
-                        <span id="db-status-badge" style="font-size:0.75rem; color:var(--success);">Firebase Sync</span>
-                    </div>
-
-                    <!-- CAMERA SCANNER SPECIFIC TO INVENTORY FORM -->
-                    <div class="scanner-container" style="aspect-ratio: 21/9; margin-bottom: 0.75rem;">
-                        <video id="video-preview-inv" playsinline></video>
-                        <div class="scanner-overlay">
-                            <div class="scanner-laser" id="scanner-laser-inv"></div>
-                        </div>
-                        <div class="scanner-status" id="scanner-status-inv">Inventory Scanner Off</div>
-                    </div>
-
-                    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-                        <button class="btn btn-outline" id="start-scanner-inv-btn">
-                            <i class="fa-solid fa-barcode"></i> Scan Barcode for Product
-                        </button>
-                        <button class="btn btn-danger" id="stop-scanner-inv-btn" style="display:none;">Stop Scanner</button>
-                    </div>
-
+                    <div class="card-header"><span class="card-title"><i class="fa-solid fa-square-plus"></i> Add Store Item</span></div>
                     <form id="add-product-form">
                         <div class="form-group">
                             <label for="inv-barcode">Barcode Number *</label>
-                            <div class="input-group">
-                                <i class="fa-solid fa-barcode"></i>
-                                <input type="text" id="inv-barcode" class="form-control" placeholder="Scan or type barcode (e.g. 8901234567890)" required>
-                            </div>
+                            <input type="text" id="inv-barcode" class="form-control" placeholder="Scan or type barcode" required style="padding-left:0.85rem;">
                         </div>
-
                         <div class="form-group">
                             <label for="inv-name">Product Name *</label>
-                            <input type="text" id="inv-name" class="form-control" placeholder="e.g. Fresh Mango Juice 500ml" required style="padding-left:0.75rem;">
+                            <input type="text" id="inv-name" class="form-control" placeholder="e.g. Fresh Milk 1L" required style="padding-left:0.85rem;">
                         </div>
-
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
-                            <div class="form-group">
-                                <label for="inv-category">Category</label>
-                                <input type="text" id="inv-category" class="form-control" placeholder="e.g. Beverages" style="padding-left:0.75rem;">
-                            </div>
-                            <div class="form-group">
-                                <label for="inv-icon">Icon</label>
-                                <select id="inv-icon" class="form-control" style="padding-left:0.75rem;">
-                                    <option value="fa-box">Box</option>
-                                    <option value="fa-mug-hot">Beverage / Coffee</option>
-                                    <option value="fa-bottle-water">Bottle / Drink</option>
-                                    <option value="fa-cookie">Snack / Food</option>
-                                    <option value="fa-bread-slice">Bakery</option>
-                                    <option value="fa-leaf">Organic / Tea</option>
-                                    <option value="fa-jar">Jar / Grocery</option>
-                                    <option value="fa-bowl-rice">Grains / Rice</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
                             <div class="form-group">
                                 <label for="inv-price">Price (₹) *</label>
-                                <input type="number" step="0.01" id="inv-price" class="form-control" placeholder="0.00" required style="padding-left:0.75rem;">
+                                <input type="number" step="0.01" id="inv-price" class="form-control" placeholder="0.00" required style="padding-left:0.85rem;">
                             </div>
                             <div class="form-group">
                                 <label for="inv-stock">Stock Quantity *</label>
-                                <input type="number" id="inv-stock" class="form-control" placeholder="0" required style="padding-left:0.75rem;">
+                                <input type="number" id="inv-stock" class="form-control" placeholder="0" required style="padding-left:0.85rem;">
                             </div>
                         </div>
-
                         <button type="submit" class="btn btn-primary" id="save-product-btn">
-                            <i class="fa-solid fa-floppy-disk"></i> Save Product to Store
+                            <i class="fa-solid fa-floppy-disk"></i> Save Product
                         </button>
                     </form>
                 </div>
 
-                <!-- STORE INVENTORY LIST TABLE -->
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title"><i class="fa-solid fa-store"></i> Store Inventory Items</span>
-                        <span id="inv-count-badge" style="font-weight:bold; color:var(--primary);">0 Items</span>
+                        <span class="card-title"><i class="fa-solid fa-store"></i> Store Products Database</span>
+                        <span id="inv-count-badge" style="font-weight:800; color:var(--primary); background:var(--primary-light); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.8rem;">0 Items</span>
                     </div>
                     <div class="table-responsive">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Product</th>
+                                    <th>Item</th>
                                     <th>Barcode</th>
-                                    <th>Category</th>
                                     <th>Price</th>
                                     <th>Stock</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="inventory-table-body">
-                                <tr>
-                                    <td colspan="6" class="empty-state">Loading store products...</td>
-                                </tr>
+                                <tr><td colspan="5" class="empty-state">Loading products...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-item active" id="mob-tab-pos"><i class="fa-solid fa-cash-register"></i> POS Terminal</button>
+        <button class="mobile-nav-item" id="mob-tab-inv"><i class="fa-solid fa-boxes-packing"></i> Store Items</button>
+    </nav>
 </div>
 
-<!-- SETTINGS MODAL -->
-<div class="modal-backdrop" id="settings-modal">
-    <div class="modal-content">
-        <div class="card-header">
-            <span class="card-title"><i class="fa-solid fa-sliders"></i> System Settings</span>
-            <button class="icon-btn" id="close-settings-btn"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="summary-row">
-                <label for="sound-toggle">Audio Feedback (Scan Beep)</label>
-                <input type="checkbox" id="sound-toggle" checked style="width:20px; height:20px;">
-            </div>
-            <div class="summary-row">
-                <label for="vibrate-toggle">Haptic Vibration</label>
-                <input type="checkbox" id="vibrate-toggle" checked style="width:20px; height:20px;">
-            </div>
-            <hr style="border:0; border-top: 1px solid var(--border);">
-            <button class="btn btn-danger" id="reset-app-data-btn">
-                <i class="fa-solid fa-triangle-exclamation"></i> Reset Local Data
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- RECEIPT MODAL -->
+<!-- PRINTABLE RECEIPT MODAL -->
 <div class="modal-backdrop" id="receipt-modal">
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content">
         <div class="card-header no-print">
             <span class="card-title">Billing Receipt</span>
             <button class="icon-btn" id="close-receipt-btn"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="printable-receipt">
             <div class="receipt-header">
-                <h2>SCANCART POS</h2>
-                <p>Retail Store Billing</p>
+                <h2>SCANCART STORE</h2>
+                <p>Retail Billing Invoice</p>
                 <p id="receipt-date-time" style="font-size:0.75rem; color:#555;"></p>
-                <p id="receipt-inv-no" style="font-size:0.75rem; font-weight:bold;"></p>
             </div>
             <div class="receipt-divider"></div>
             <table class="receipt-table">
                 <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th style="text-align: center;">Qty</th>
-                        <th style="text-align: right;">Amount</th>
-                    </tr>
+                    <tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Total</th></tr>
                 </thead>
                 <tbody id="receipt-table-body"></tbody>
             </table>
             <div class="receipt-divider"></div>
             <div class="summary-row"><span>Subtotal:</span><span id="receipt-subtotal"></span></div>
             <div class="summary-row"><span>Discount:</span><span id="receipt-discount"></span></div>
-            <div class="summary-row"><span>GST:</span><span id="receipt-tax"></span></div>
+            <div class="summary-row"><span>Tax:</span><span id="receipt-tax"></span></div>
             <div class="receipt-divider"></div>
-            <div class="summary-row receipt-total"><span>TOTAL:</span><span id="receipt-grand-total"></span></div>
-            <div class="receipt-divider"></div>
-            <p style="text-align:center; font-size: 0.8rem; margin-top: 0.5rem;">Thank you for shopping!</p>
+            <div class="summary-row" style="font-weight:bold; font-size:1.1rem;"><span>TOTAL:</span><span id="receipt-grand-total"></span></div>
         </div>
-        <button class="btn btn-primary no-print" id="modal-print-btn" style="margin-top: 1rem;">
-            <i class="fa-solid fa-print"></i> Print Receipt
+        <button class="btn btn-primary no-print" id="modal-print-btn" style="margin-top: 1.25rem;">
+            <i class="fa-solid fa-print"></i> Print Now
         </button>
     </div>
 </div>
 
-<!-- TOAST CONTAINER -->
 <div class="toast-container" id="toast-container"></div>
 
-<!-- FIREBASE SDK & JAVASCRIPT APPLICATION CODE -->
+<!-- FIREBASE MODULE & JS ENGINE -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- 1. FIREBASE INITIALIZATION & SECURE CONFIG ---
     const userFirebaseConfig = {
       apiKey: "AIzaSyAFzUs5Lt-JKslgCT4es6x0o_7C8bTPu0c",
       authDomain: "scaner-6d218.firebaseapp.com",
@@ -1126,63 +567,48 @@
     const db = getFirestore(app);
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'scaner-6d218';
 
-    // Strict Path Rule: /artifacts/{appId}/public/data/products
     const productsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'products');
 
-    // --- DEFAULT INITIAL SEED PRODUCTS FOR FIRST TIME ---
-    const SEED_PRODUCTS = [
-        { barcode: "8901234567890", name: "Premium Arabica Coffee", category: "Beverages", price: 250.00, stock: 45, icon: "fa-mug-hot" },
-        { barcode: "8909876543210", name: "Organic Whole Milk 1L", category: "Dairy", price: 65.00, stock: 30, icon: "fa-bottle-water" },
-        { barcode: "8901111222233", name: "Artisanal Dark Chocolate", category: "Snacks", price: 120.00, stock: 50, icon: "fa-cookie" },
-        { barcode: "8904444555566", name: "Whole Wheat Bread 400g", category: "Bakery", price: 45.00, stock: 20, icon: "fa-bread-slice" },
-        { barcode: "8907777888899", name: "Green Tea Pack 100g", category: "Beverages", price: 180.00, stock: 15, icon: "fa-leaf" }
+    const DEFAULT_SEED_ITEMS = [
+        { barcode: "8901234567890", name: "Arabica Coffee 200g", price: 250.00, stock: 30 },
+        { barcode: "8909876543210", name: "Fresh Milk 1L", price: 65.00, stock: 25 },
+        { barcode: "8901111222233", name: "Dark Chocolate", price: 120.00, stock: 40 }
     ];
 
-    // --- APPLICATION STATE ---
     let state = {
         user: null,
         products: [],
         cart: [],
-        scannedHistory: [],
         discountPercent: 0,
         taxPercent: 5,
-        settings: { sound: true, vibration: true, theme: 'light' },
+        theme: 'light',
         currentPosProduct: null,
         activeScannerStream: null,
-        activeScannerMode: null, // 'pos' or 'inv'
+        cameraFacing: 'environment',
         barcodeDetector: null
     };
 
-    // --- DOM ELEMENTS ---
     const elements = {
         themeToggleBtn: document.getElementById('theme-toggle-btn'),
-        settingsBtn: document.getElementById('settings-btn'),
-        closeSettingsBtn: document.getElementById('close-settings-btn'),
-        settingsModal: document.getElementById('settings-modal'),
-        soundToggle: document.getElementById('sound-toggle'),
-        vibrateToggle: document.getElementById('vibrate-toggle'),
-        resetAppDataBtn: document.getElementById('reset-app-data-btn'),
-        
         tabPos: document.getElementById('tab-pos'),
         tabInventory: document.getElementById('tab-inventory'),
+        mobTabPos: document.getElementById('mob-tab-pos'),
+        mobTabInv: document.getElementById('mob-tab-inv'),
         posView: document.getElementById('pos-view'),
         inventoryView: document.getElementById('inventory-view'),
         
-        // POS Scanner
         videoPreviewPos: document.getElementById('video-preview-pos'),
         scannerLaserPos: document.getElementById('scanner-laser-pos'),
         scannerStatusPos: document.getElementById('scanner-status-pos'),
         cameraStatusBadge: document.getElementById('camera-status-badge'),
         startScannerPosBtn: document.getElementById('start-scanner-pos-btn'),
         stopScannerPosBtn: document.getElementById('stop-scanner-pos-btn'),
+        switchCameraBtn: document.getElementById('switch-camera-btn'),
         barcodeInputPos: document.getElementById('barcode-input-pos'),
         searchPosBtn: document.getElementById('search-pos-btn'),
         searchDropdownPos: document.getElementById('search-dropdown-pos'),
         productResultBodyPos: document.getElementById('product-result-body-pos'),
-        recentScansList: document.getElementById('recent-scans-list'),
-        clearHistoryBtn: document.getElementById('clear-history-btn'),
         
-        // Cart
         cartItemsContainer: document.getElementById('cart-items-container'),
         clearCartBtn: document.getElementById('clear-cart-btn'),
         summarySubtotal: document.getElementById('summary-subtotal'),
@@ -1191,283 +617,130 @@
         summaryDiscount: document.getElementById('summary-discount'),
         summaryTax: document.getElementById('summary-tax'),
         summaryGrandTotal: document.getElementById('summary-grand-total'),
-        viewReceiptBtn: document.getElementById('view-receipt-btn'),
         printReceiptBtn: document.getElementById('print-receipt-btn'),
+        proceedCheckoutBtn: document.getElementById('proceed-checkout-btn'),
         receiptModal: document.getElementById('receipt-modal'),
         closeReceiptBtn: document.getElementById('close-receipt-btn'),
         modalPrintBtn: document.getElementById('modal-print-btn'),
-        
-        // Inventory / Add Product Page
-        videoPreviewInv: document.getElementById('video-preview-inv'),
-        scannerLaserInv: document.getElementById('scanner-laser-inv'),
-        scannerStatusInv: document.getElementById('scanner-status-inv'),
-        startScannerInvBtn: document.getElementById('start-scanner-inv-btn'),
-        stopScannerInvBtn: document.getElementById('stop-scanner-inv-btn'),
+
         addProductForm: document.getElementById('add-product-form'),
         invBarcode: document.getElementById('inv-barcode'),
         invName: document.getElementById('inv-name'),
-        invCategory: document.getElementById('inv-category'),
-        invIcon: document.getElementById('inv-icon'),
         invPrice: document.getElementById('inv-price'),
         invStock: document.getElementById('inv-stock'),
         inventoryTableBody: document.getElementById('inventory-table-body'),
         invCountBadge: document.getElementById('inv-count-badge'),
-        
         toastContainer: document.getElementById('toast-container')
     };
 
-    // --- INITIALIZATION & AUTH ---
     window.addEventListener('DOMContentLoaded', async () => {
-        loadLocalStorage();
-        initTheme();
         initBarcodeDetector();
         setupEventListeners();
 
-        // Step 1: Initialize Auth Rule 3
         try {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
                 await signInAnonymously(auth);
             }
-        } catch (e) {
-            console.error("Auth init error:", e);
-        }
+        } catch (e) {}
 
         onAuthStateChanged(auth, (user) => {
             state.user = user;
-            if (user) {
-                subscribeToProducts();
-            }
+            if (user) subscribeToProducts();
         });
 
         renderCart();
-        renderHistory();
     });
 
-    // --- FIREBASE FIRESTORE SYNC ---
     function subscribeToProducts() {
         if (!state.user) return;
-        
         onSnapshot(productsCollection, (snapshot) => {
-            const fetched = [];
-            snapshot.forEach(doc => {
-                fetched.push({ id: doc.id, ...doc.data() });
-            });
-            
-            // If DB is totally empty on first run, seed default demo items
-            if (fetched.length === 0) {
-                seedInitialProducts();
+            const items = [];
+            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+            if (items.length === 0) {
+                seedInitialItems();
             } else {
-                state.products = fetched;
+                state.products = items;
                 renderInventoryTable();
             }
-        }, (err) => {
-            console.error("Firestore sync error:", err);
-            showToast("Offline/Sync error with store data", "danger");
         });
     }
 
-    async function seedInitialProducts() {
-        for (const item of SEED_PRODUCTS) {
+    async function seedInitialItems() {
+        for (const item of DEFAULT_SEED_ITEMS) {
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', item.barcode), item);
         }
     }
 
-    async function saveProductToStore(productData) {
-        if (!state.user) return;
-        try {
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', productData.barcode), productData);
-            showToast(`Product "${productData.name}" saved to store!`, "success");
-        } catch (e) {
-            showToast("Failed to save product to Firebase", "danger");
-        }
-    }
-
-    async function deleteProductFromStore(barcode) {
-        if (!state.user) return;
-        if (confirm(`Remove barcode ${barcode} from store inventory?`)) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', barcode));
-                showToast("Product deleted from store", "info");
-            } catch (e) {
-                showToast("Failed to delete product", "danger");
-            }
-        }
-    }
-
-    // --- LOCAL STORAGE ---
-    function loadLocalStorage() {
-        const savedCart = localStorage.getItem('scancart_cart');
-        if (savedCart) state.cart = JSON.parse(savedCart);
-        const savedHistory = localStorage.getItem('scancart_history');
-        if (savedHistory) state.scannedHistory = JSON.parse(savedHistory);
-        const savedSettings = localStorage.getItem('scancart_settings');
-        if (savedSettings) state.settings = JSON.parse(savedSettings);
-
-        state.discountPercent = parseFloat(localStorage.getItem('scancart_discount')) || 0;
-        state.taxPercent = parseFloat(localStorage.getItem('scancart_tax')) || 5;
-
-        elements.discountInput.value = state.discountPercent;
-        elements.taxSelect.value = state.taxPercent;
-        elements.soundToggle.checked = state.settings.sound;
-        elements.vibrateToggle.checked = state.settings.vibration;
-    }
-
-    function saveLocalStorage() {
-        localStorage.setItem('scancart_cart', JSON.stringify(state.cart));
-        localStorage.setItem('scancart_history', JSON.stringify(state.scannedHistory));
-        localStorage.setItem('scancart_settings', JSON.stringify(state.settings));
-        localStorage.setItem('scancart_discount', state.discountPercent);
-        localStorage.setItem('scancart_tax', state.taxPercent);
-    }
-
-    // --- FORMATTER & FEEDBACK ---
     function formatCurrency(amount) {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
     }
 
-    function triggerFeedback() {
-        if (state.settings.vibration && navigator.vibrate) navigator.vibrate(100);
-        if (state.settings.sound) {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, ctx.currentTime);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.15);
-            } catch (e) {}
-        }
-    }
-
-    function showToast(message, type = 'info') {
+    function showToast(msg, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        let icon = type === 'success' ? 'fa-check-circle' : (type === 'danger' ? 'fa-exclamation-triangle' : 'fa-info-circle');
-        toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+        toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${msg}</span>`;
         elements.toastContainer.appendChild(toast);
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => toast.remove(), 300);
+            toast.remove();
         }, 3000);
     }
 
-    // --- THEME ---
-    function initTheme() {
-        document.documentElement.setAttribute('data-theme', state.settings.theme);
-        elements.themeToggleBtn.querySelector('i').className = state.settings.theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    }
-
-    function toggleTheme() {
-        state.settings.theme = state.settings.theme === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', state.settings.theme);
-        elements.themeToggleBtn.querySelector('i').className = state.settings.theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        saveLocalStorage();
-    }
-
-    // --- VIEW / PAGE SWITCHER ---
-    function switchView(viewName) {
-        stopActiveScanner();
-        if (viewName === 'pos-view') {
-            elements.tabPos.classList.add('active');
-            elements.tabInventory.classList.remove('active');
-            elements.posView.classList.add('active');
-            elements.inventoryView.classList.remove('active');
-        } else {
-            elements.tabInventory.classList.add('active');
-            elements.tabPos.classList.remove('active');
-            elements.inventoryView.classList.add('active');
-            elements.posView.classList.remove('active');
-        }
-    }
-
-    // --- CAMERA BARCODE SCANNING ---
+    /* CAMERA & SCANNER ENGINE */
     async function initBarcodeDetector() {
         if ('BarcodeDetector' in window) {
             try {
                 const formats = await BarcodeDetector.getSupportedFormats();
-                if (formats.length > 0) {
-                    state.barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a'] });
-                }
+                if (formats.length > 0) state.barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a'] });
             } catch (e) {}
         }
     }
 
-    async function startScanner(mode) {
-        stopActiveScanner();
-        state.activeScannerMode = mode;
-        const videoElem = mode === 'pos' ? elements.videoPreviewPos : elements.videoPreviewInv;
-        const laserElem = mode === 'pos' ? elements.scannerLaserPos : elements.scannerLaserInv;
-        const statusElem = mode === 'pos' ? elements.scannerStatusPos : elements.scannerStatusInv;
-        const startBtn = mode === 'pos' ? elements.startScannerPosBtn : elements.startScannerInvBtn;
-        const stopBtn = mode === 'pos' ? elements.stopScannerPosBtn : elements.stopScannerInvBtn;
-
+    async function startScanner() {
+        stopScanner();
         try {
-            statusElem.textContent = "Requesting camera...";
-            state.activeScannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            videoElem.srcObject = state.activeScannerStream;
-            await videoElem.play();
+            elements.scannerStatusPos.textContent = "Connecting camera...";
+            state.activeScannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: state.cameraFacing } });
+            elements.videoPreviewPos.srcObject = state.activeScannerStream;
+            await elements.videoPreviewPos.play();
 
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'inline-flex';
-            laserElem.style.display = 'block';
-            statusElem.textContent = "Scanning barcode...";
-            if (mode === 'pos') {
-                elements.cameraStatusBadge.textContent = "Active";
-                elements.cameraStatusBadge.style.color = "var(--success)";
-            }
+            elements.startScannerPosBtn.style.display = 'none';
+            elements.stopScannerPosBtn.style.display = 'inline-flex';
+            elements.scannerLaserPos.style.display = 'block';
+            elements.scannerStatusPos.textContent = "Scanning barcode...";
+            elements.cameraStatusBadge.textContent = "Active";
+            elements.cameraStatusBadge.style.color = "var(--success)";
             scanFrameLoop();
         } catch (err) {
             showToast("Camera access denied or unavailable", "danger");
-            statusElem.textContent = "Camera Error";
         }
     }
 
-    function stopActiveScanner() {
+    function stopScanner() {
         if (state.activeScannerStream) {
             state.activeScannerStream.getTracks().forEach(track => track.stop());
             state.activeScannerStream = null;
         }
-        state.activeScannerMode = null;
         elements.startScannerPosBtn.style.display = 'inline-flex';
         elements.stopScannerPosBtn.style.display = 'none';
         elements.scannerLaserPos.style.display = 'none';
-        elements.scannerStatusPos.textContent = "Camera Off";
+        elements.scannerStatusPos.textContent = "Camera Stopped";
         elements.cameraStatusBadge.textContent = "Off";
         elements.cameraStatusBadge.style.color = "var(--muted)";
-
-        elements.startScannerInvBtn.style.display = 'inline-flex';
-        elements.stopScannerInvBtn.style.display = 'none';
-        elements.scannerLaserInv.style.display = 'none';
-        elements.scannerStatusInv.textContent = "Inventory Scanner Off";
     }
 
     async function scanFrameLoop() {
-        if (!state.activeScannerMode) return;
-        const videoElem = state.activeScannerMode === 'pos' ? elements.videoPreviewPos : elements.videoPreviewInv;
-
-        if (state.barcodeDetector && videoElem.readyState === videoElem.HAVE_ENOUGH_DATA) {
+        if (!state.activeScannerStream) return;
+        if (state.barcodeDetector && elements.videoPreviewPos.readyState === elements.videoPreviewPos.HAVE_ENOUGH_DATA) {
             try {
-                const barcodes = await state.barcodeDetector.detect(videoElem);
+                const barcodes = await state.barcodeDetector.detect(elements.videoPreviewPos);
                 if (barcodes.length > 0) {
                     const barcode = barcodes[0].rawValue;
-                    triggerFeedback();
-                    showToast(`Scanned Barcode: ${barcode}`, "success");
-                    
-                    if (state.activeScannerMode === 'pos') {
-                        elements.barcodeInputPos.value = barcode;
-                        processPosBarcodeSearch(barcode);
-                    } else {
-                        elements.invBarcode.value = barcode;
-                        autoFillInventoryFormIfFound(barcode);
-                    }
-                    stopActiveScanner();
+                    showToast(`Detected: ${barcode}`, "success");
+                    elements.barcodeInputPos.value = barcode;
+                    processPosBarcodeSearch(barcode);
+                    stopScanner();
                     return;
                 }
             } catch (e) {}
@@ -1475,31 +748,15 @@
         requestAnimationFrame(scanFrameLoop);
     }
 
-    // --- POS SEARCH & SELECTION ---
-    async function processPosBarcodeSearch(barcode) {
-        elements.productResultBodyPos.innerHTML = `
-            <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Searching store...</p></div>
-        `;
+    /* SEARCH & CART ENGINE */
+    function processPosBarcodeSearch(barcode) {
         const product = state.products.find(p => p.barcode === barcode.trim());
         if (product) {
             state.currentPosProduct = { ...product, selectedQty: 1 };
             renderProductCardPos(state.currentPosProduct);
-            addToHistory(product);
         } else {
             state.currentPosProduct = null;
-            elements.productResultBodyPos.innerHTML = `
-                <div class="empty-state">
-                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);"></i>
-                    <p>No product found for barcode: <strong>${barcode}</strong></p>
-                    <button class="btn btn-outline" id="go-add-prod-btn" style="margin-top:0.5rem; width:auto;">
-                        <i class="fa-solid fa-plus"></i> Add to Store Inventory
-                    </button>
-                </div>
-            `;
-            document.getElementById('go-add-prod-btn')?.addEventListener('click', () => {
-                switchView('inventory-view');
-                elements.invBarcode.value = barcode;
-            });
+            elements.productResultBodyPos.innerHTML = `<div class="empty-state"><p>No product found for code: <strong>${barcode}</strong></p></div>`;
         }
     }
 
@@ -1507,10 +764,10 @@
         elements.productResultBodyPos.innerHTML = `
             <div class="product-result-card">
                 <div class="product-details">
-                    <div class="product-image"><i class="fa-solid ${product.icon || 'fa-box'}"></i></div>
+                    <div class="product-image"><i class="fa-solid fa-box"></i></div>
                     <div class="product-info">
                         <h3>${product.name}</h3>
-                        <p>Barcode: ${product.barcode} | Category: ${product.category || 'General'}</p>
+                        <p>Barcode: ${product.barcode} | Available Stock: <strong>${product.stock}</strong></p>
                         <div class="product-price">${formatCurrency(product.price)}</div>
                     </div>
                 </div>
@@ -1534,56 +791,55 @@
             }
         };
         document.getElementById('prod-inc-btn').onclick = () => {
-            state.currentPosProduct.selectedQty++;
-            document.getElementById('prod-qty-input').value = state.currentPosProduct.selectedQty;
+            if (state.currentPosProduct.selectedQty < product.stock) {
+                state.currentPosProduct.selectedQty++;
+                document.getElementById('prod-qty-input').value = state.currentPosProduct.selectedQty;
+            } else {
+                showToast("Cannot exceed available store stock!", "danger");
+            }
         };
-        document.getElementById('add-to-cart-btn').onclick = () => {
-            addToCart(state.currentPosProduct, state.currentPosProduct.selectedQty);
-        };
+        document.getElementById('add-to-cart-btn').onclick = () => addToCart(state.currentPosProduct, state.currentPosProduct.selectedQty);
     }
 
-    // --- POS CART CALCULATIONS ---
     function addToCart(product, quantity) {
         const existing = state.cart.find(i => i.barcode === product.barcode);
+        const totalQty = (existing ? existing.qty : 0) + quantity;
+
+        if (totalQty > product.stock) {
+            return showToast(`Only ${product.stock} items available in stock!`, "danger");
+        }
+
         if (existing) {
-            existing.qty += quantity;
+            existing.qty = totalQty;
         } else {
-            state.cart.push({
-                barcode: product.barcode,
-                name: product.name,
-                price: product.price,
-                qty: quantity
-            });
+            state.cart.push({ barcode: product.barcode, name: product.name, price: product.price, qty: quantity });
         }
         showToast(`Added ${product.name} to cart`, "success");
-        saveLocalStorage();
         renderCart();
     }
 
     window.updateCartQty = function(barcode, newQty) {
         const item = state.cart.find(i => i.barcode === barcode);
+        const prod = state.products.find(p => p.barcode === barcode);
+
         if (item) {
-            item.qty = newQty;
-            if (item.qty <= 0) {
-                removeFromCart(barcode);
-            } else {
-                saveLocalStorage();
-                renderCart();
+            if (newQty > prod.stock) {
+                return showToast(`Stock limit reached (${prod.stock} max)`, "danger");
             }
+            item.qty = newQty;
+            if (item.qty <= 0) removeFromCart(barcode);
+            else renderCart();
         }
     };
 
     window.removeFromCart = function(barcode) {
         state.cart = state.cart.filter(i => i.barcode !== barcode);
-        saveLocalStorage();
         renderCart();
     };
 
     function renderCart() {
         if (state.cart.length === 0) {
-            elements.cartItemsContainer.innerHTML = `
-                <div class="empty-state"><i class="fa-solid fa-basket-shopping"></i><p>Cart is empty.</p></div>
-            `;
+            elements.cartItemsContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-basket-shopping"></i><p>Cart is currently empty.</p></div>`;
         } else {
             elements.cartItemsContainer.innerHTML = state.cart.map(item => `
                 <div class="cart-item">
@@ -1594,13 +850,11 @@
                     <div class="cart-item-actions">
                         <div class="quantity-control">
                             <button class="qty-btn" onclick="updateCartQty('${item.barcode}', ${item.qty - 1})">-</button>
-                            <span style="font-weight:bold;">${item.qty}</span>
+                            <span style="font-weight:700;">${item.qty}</span>
                             <button class="qty-btn" onclick="updateCartQty('${item.barcode}', ${item.qty + 1})">+</button>
                         </div>
                         <div class="cart-item-subtotal">${formatCurrency(item.price * item.qty)}</div>
-                        <button class="icon-btn" onclick="removeFromCart('${item.barcode}')" style="border:none; color:var(--danger);">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                        <button class="icon-btn" onclick="removeFromCart('${item.barcode}')" style="border:none; color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -1623,50 +877,64 @@
         return { subtotal, discountAmount, taxAmount, grandTotal };
     }
 
-    // --- HISTORY ---
-    function addToHistory(product) {
-        state.scannedHistory = state.scannedHistory.filter(h => h.barcode !== product.barcode);
-        state.scannedHistory.unshift({ barcode: product.barcode, name: product.name });
-        if (state.scannedHistory.length > 20) state.scannedHistory.pop();
-        saveLocalStorage();
-        renderHistory();
-    }
-
-    function renderHistory() {
-        if (state.scannedHistory.length === 0) {
-            elements.recentScansList.innerHTML = `<span style="font-size:0.8rem; color:var(--muted);">No scans yet</span>`;
-            return;
+    /* 🔥 AUTOMATIC STORE STOCK DEDUCTION ON PROCEED 🔥 */
+    async function proceedCheckout() {
+        if (state.cart.length === 0) {
+            return showToast("Cart is empty! Add items to proceed.", "danger");
         }
-        elements.recentScansList.innerHTML = state.scannedHistory.map(item => `
-            <div class="scan-chip" data-barcode="${item.barcode}">
-                <i class="fa-solid fa-barcode"></i> <span>${item.name}</span>
-            </div>
-        `).join('');
 
-        document.querySelectorAll('.scan-chip').forEach(chip => {
-            chip.onclick = () => processPosBarcodeSearch(chip.getAttribute('data-barcode'));
-        });
-    }
+        elements.proceedCheckoutBtn.disabled = true;
+        elements.proceedCheckoutBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
 
-    // --- INVENTORY MANAGEMENT (ADD PRODUCT PAGE) ---
-    function autoFillInventoryFormIfFound(barcode) {
-        const found = state.products.find(p => p.barcode === barcode.trim());
-        if (found) {
-            elements.invName.value = found.name;
-            elements.invCategory.value = found.category || '';
-            elements.invIcon.value = found.icon || 'fa-box';
-            elements.invPrice.value = found.price;
-            elements.invStock.value = found.stock;
-            showToast("Existing store product loaded for editing", "info");
+        try {
+            // Transaction ensuring atomic stock update in Firebase
+            await runTransaction(db, async (transaction) => {
+                const stockUpdates = [];
+
+                for (const item of state.cart) {
+                    const productRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', item.barcode);
+                    const prodDoc = await transaction.get(productRef);
+
+                    if (!prodDoc.exists()) {
+                        throw new Error(`Product ${item.name} does not exist in store!`);
+                    }
+
+                    const currentStock = prodDoc.data().stock || 0;
+                    if (currentStock < item.qty) {
+                        throw new Error(`Insufficient stock for ${item.name}! Stock left: ${currentStock}`);
+                    }
+
+                    stockUpdates.push({ ref: productRef, newStock: currentStock - item.qty });
+                }
+
+                // Apply deductions
+                stockUpdates.forEach(update => {
+                    transaction.update(update.ref, { stock: update.newStock });
+                });
+            });
+
+            showToast("Sale Completed! Store inventory updated.", "success");
+            
+            // Generate Bill and clear cart
+            generateReceiptData();
+            elements.receiptModal.classList.add('active');
+            state.cart = [];
+            renderCart();
+            elements.productResultBodyPos.innerHTML = `<div class="empty-state"><i class="fa-solid fa-barcode"></i><p>Scan a barcode to view item details.</p></div>`;
+
+        } catch (err) {
+            showToast(err.message || "Failed to process sale", "danger");
+        } finally {
+            elements.proceedCheckoutBtn.disabled = false;
+            elements.proceedCheckoutBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Proceed`;
         }
     }
 
+    /* INVENTORY TABLE MANAGEMENT */
     function renderInventoryTable() {
         elements.invCountBadge.textContent = `${state.products.length} Items`;
         if (state.products.length === 0) {
-            elements.inventoryTableBody.innerHTML = `
-                <tr><td colspan="6" class="empty-state">No products in store database yet. Use form to add one.</td></tr>
-            `;
+            elements.inventoryTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">No products found.</td></tr>`;
             return;
         }
 
@@ -1674,167 +942,29 @@
             <tr>
                 <td><strong>${p.name}</strong></td>
                 <td><code>${p.barcode}</code></td>
-                <td>${p.category || 'General'}</td>
                 <td><strong>${formatCurrency(p.price)}</strong></td>
-                <td><span style="padding:0.2rem 0.5rem; border-radius:12px; font-size:0.75rem; background:var(--primary-light); color:var(--primary);">${p.stock} in stock</span></td>
+                <td><span style="padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; background:${p.stock > 5 ? 'var(--primary-light)' : 'var(--danger-light)'}; color:${p.stock > 5 ? 'var(--primary)' : 'var(--danger)'}; font-weight:700;">${p.stock} units</span></td>
                 <td>
-                    <button class="icon-btn edit-inv-btn" data-barcode="${p.barcode}" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                    <button class="icon-btn del-inv-btn" data-barcode="${p.barcode}" title="Delete" style="color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
+                    <button class="icon-btn del-inv-btn" data-barcode="${p.barcode}" style="color:var(--danger);"><i class="fa-solid fa-trash"></i></button>
                 </td>
             </tr>
         `).join('');
 
-        document.querySelectorAll('.edit-inv-btn').forEach(btn => {
-            btn.onclick = () => {
-                const barcode = btn.getAttribute('data-barcode');
-                elements.invBarcode.value = barcode;
-                autoFillInventoryFormIfFound(barcode);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-        });
-
         document.querySelectorAll('.del-inv-btn').forEach(btn => {
-            btn.onclick = () => {
-                deleteProductFromStore(btn.getAttribute('data-barcode'));
+            btn.onclick = async () => {
+                const b = btn.getAttribute('data-barcode');
+                if (confirm(`Remove item ${b} from store?`)) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', b));
+                    showToast("Item deleted", "info");
+                }
             };
         });
-    }
-
-    // --- EVENT LISTENERS ---
-    function setupEventListeners() {
-        elements.themeToggleBtn.onclick = toggleTheme;
-        elements.settingsBtn.onclick = () => elements.settingsModal.classList.add('active');
-        elements.closeSettingsBtn.onclick = () => elements.settingsModal.classList.remove('active');
-        
-        // Navigation Tabs (Page Switcher)
-        elements.tabPos.onclick = () => switchView('pos-view');
-        elements.tabInventory.onclick = () => switchView('inventory-view');
-
-        elements.soundToggle.onchange = (e) => { state.settings.sound = e.target.checked; saveLocalStorage(); };
-        elements.vibrateToggle.onchange = (e) => { state.settings.vibration = e.target.checked; saveLocalStorage(); };
-        elements.resetAppDataBtn.onclick = () => {
-            if (confirm("Reset local storage settings and cart?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        };
-
-        // POS Scanner Controls
-        elements.startScannerPosBtn.onclick = () => startScanner('pos');
-        elements.stopScannerPosBtn.onclick = stopActiveScanner;
-        
-        // Inventory Scanner Controls
-        elements.startScannerInvBtn.onclick = () => startScanner('inv');
-        elements.stopScannerInvBtn.onclick = stopActiveScanner;
-
-        elements.invBarcode.onchange = (e) => autoFillInventoryFormIfFound(e.target.value);
-
-        // POS Search Input & Live Dropdown
-        elements.barcodeInputPos.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (query.length < 2) {
-                elements.searchDropdownPos.style.display = 'none';
-                return;
-            }
-            const matches = state.products.filter(p => p.name.toLowerCase().includes(query) || p.barcode.includes(query));
-            if (matches.length > 0) {
-                elements.searchDropdownPos.innerHTML = matches.map(p => `
-                    <div class="search-result-item" data-barcode="${p.barcode}">
-                        <div><strong>${p.name}</strong><div style="font-size:0.75rem; color:var(--muted);">${p.barcode}</div></div>
-                        <span style="font-weight:bold; color:var(--primary);">${formatCurrency(p.price)}</span>
-                    </div>
-                `).join('');
-                elements.searchDropdownPos.style.display = 'block';
-
-                document.querySelectorAll('.search-result-item').forEach(item => {
-                    item.onclick = () => {
-                        const b = item.getAttribute('data-barcode');
-                        elements.barcodeInputPos.value = b;
-                        elements.searchDropdownPos.style.display = 'none';
-                        processPosBarcodeSearch(b);
-                    };
-                });
-            } else {
-                elements.searchDropdownPos.style.display = 'none';
-            }
-        });
-
-        elements.searchPosBtn.onclick = () => {
-            if (elements.barcodeInputPos.value) processPosBarcodeSearch(elements.barcodeInputPos.value);
-        };
-
-        elements.barcodeInputPos.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-                elements.searchDropdownPos.style.display = 'none';
-                processPosBarcodeSearch(e.target.value);
-            }
-        };
-
-        elements.clearCartBtn.onclick = () => {
-            if (state.cart.length > 0 && confirm("Empty cart?")) {
-                state.cart = [];
-                saveLocalStorage();
-                renderCart();
-            }
-        };
-
-        elements.clearHistoryBtn.onclick = () => {
-            state.scannedHistory = [];
-            saveLocalStorage();
-            renderHistory();
-        };
-
-        elements.discountInput.oninput = (e) => {
-            let val = parseFloat(e.target.value) || 0;
-            state.discountPercent = Math.min(100, Math.max(0, val));
-            saveLocalStorage();
-            calculateBill();
-        };
-
-        elements.taxSelect.onchange = (e) => {
-            state.taxPercent = parseFloat(e.target.value) || 0;
-            saveLocalStorage();
-            calculateBill();
-        };
-
-        // Form Submission to Add/Update Store Inventory
-        elements.addProductForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const productData = {
-                barcode: elements.invBarcode.value.trim(),
-                name: elements.invName.value.trim(),
-                category: elements.invCategory.value.trim() || 'General',
-                icon: elements.invIcon.value,
-                price: parseFloat(elements.invPrice.value) || 0,
-                stock: parseInt(elements.invStock.value) || 0
-            };
-
-            await saveProductToStore(productData);
-            elements.addProductForm.reset();
-        };
-
-        // Print & Receipt Modal
-        elements.viewReceiptBtn.onclick = () => {
-            if (state.cart.length === 0) return showToast("Cart is empty", "danger");
-            generateReceiptData();
-            elements.receiptModal.classList.add('active');
-        };
-
-        elements.closeReceiptBtn.onclick = () => elements.receiptModal.classList.remove('active');
-
-        elements.printReceiptBtn.onclick = elements.modalPrintBtn.onclick = () => {
-            if (state.cart.length === 0) return showToast("Cart is empty", "danger");
-            generateReceiptData();
-            window.print();
-        };
     }
 
     function generateReceiptData() {
         const calcs = calculateBill();
         const now = new Date();
         document.getElementById('receipt-date-time').textContent = now.toLocaleString();
-        document.getElementById('receipt-inv-no').textContent = `INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(1000+Math.random()*9000)}`;
-
         document.getElementById('receipt-table-body').innerHTML = state.cart.map(i => `
             <tr><td>${i.name}</td><td style="text-align:center;">${i.qty}</td><td style="text-align:right;">${formatCurrency(i.price * i.qty)}</td></tr>
         `).join('');
@@ -1844,7 +974,67 @@
         document.getElementById('receipt-tax').textContent = `+${formatCurrency(calcs.taxAmount)}`;
         document.getElementById('receipt-grand-total').textContent = formatCurrency(calcs.grandTotal);
     }
+
+    /* EVENT LISTENERS */
+    function setupEventListeners() {
+        elements.themeToggleBtn.onclick = () => {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', state.theme);
+        };
+
+        const switchTab = (viewName) => {
+            stopScanner();
+            if (viewName === 'pos') {
+                elements.tabPos.classList.add('active'); elements.tabInventory.classList.remove('active');
+                elements.mobTabPos.classList.add('active'); elements.mobTabInv.classList.remove('active');
+                elements.posView.classList.add('active'); elements.inventoryView.classList.remove('active');
+            } else {
+                elements.tabInventory.classList.add('active'); elements.tabPos.classList.remove('active');
+                elements.mobTabInv.classList.add('active'); elements.mobTabPos.classList.remove('active');
+                elements.inventoryView.classList.add('active'); elements.posView.classList.remove('active');
+            }
+        };
+
+        elements.tabPos.onclick = elements.mobTabPos.onclick = () => switchTab('pos');
+        elements.tabInventory.onclick = elements.mobTabInv.onclick = () => switchTab('inv');
+
+        elements.startScannerPosBtn.onclick = startScanner;
+        elements.stopScannerPosBtn.onclick = stopScanner;
+        elements.switchCameraBtn.onclick = () => {
+            state.cameraFacing = state.cameraFacing === 'environment' ? 'user' : 'environment';
+            if (state.activeScannerStream) startScanner();
+        };
+
+        elements.searchPosBtn.onclick = () => { if (elements.barcodeInputPos.value) processPosBarcodeSearch(elements.barcodeInputPos.value); };
+        elements.barcodeInputPos.onkeydown = (e) => { if (e.key === 'Enter') processPosBarcodeSearch(e.target.value); };
+
+        elements.clearCartBtn.onclick = () => { state.cart = []; renderCart(); };
+        elements.discountInput.oninput = (e) => { state.discountPercent = parseFloat(e.target.value) || 0; calculateBill(); };
+        elements.taxSelect.onchange = (e) => { state.taxPercent = parseFloat(e.target.value) || 0; calculateBill(); };
+
+        // Proceed & Print Click Events
+        elements.proceedCheckoutBtn.onclick = proceedCheckout;
+        elements.printReceiptBtn.onclick = () => {
+            if (state.cart.length === 0) return showToast("Cart is empty!", "danger");
+            generateReceiptData();
+            elements.receiptModal.classList.add('active');
+        };
+        elements.closeReceiptBtn.onclick = () => elements.receiptModal.classList.remove('active');
+        elements.modalPrintBtn.onclick = () => window.print();
+
+        elements.addProductForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                barcode: elements.invBarcode.value.trim(),
+                name: elements.invName.value.trim(),
+                price: parseFloat(elements.invPrice.value) || 0,
+                stock: parseInt(elements.invStock.value) || 0
+            };
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', data.barcode), data);
+            showToast(`Product "${data.name}" added!`, "success");
+            elements.addProductForm.reset();
+        };
+    }
 </script>
 </body>
 </html>
-
