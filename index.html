@@ -760,7 +760,7 @@
                 <i class="fa-solid fa-barcode"></i>
                 <input type="text" id="barcode-input" class="input-field" placeholder="Scan or enter barcode (Press Enter)" autofocus>
               </div>
-              <button class="btn btn-secondary" onclick="openCameraScanner()"><i class="fa-solid fa-camera"></i> Scan</button>
+              <button class="btn btn-secondary" onclick="openCameraScanner('pos')"><i class="fa-solid fa-camera"></i> Scan</button>
             </div>
 
             <div class="scanner-bar">
@@ -1005,7 +1005,7 @@
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
 
-  <!-- Modal: Product Edit / Add -->
+  <!-- Modal: Product Edit / Add (Updated with Camera & Barcode Scanner) -->
   <div id="product-modal" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -1022,7 +1022,12 @@
           <div class="grid-2">
             <div class="input-group">
               <label>Barcode *</label>
-              <input type="text" id="prod-barcode" class="input-field" required>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="prod-barcode" class="input-field" placeholder="Scan or type barcode" required style="flex: 1;">
+                <button type="button" class="btn btn-secondary" onclick="openCameraScanner('prod-barcode')" title="Scan barcode with camera">
+                  <i class="fa-solid fa-camera"></i> Scan
+                </button>
+              </div>
             </div>
             <div class="input-group">
               <label>SKU</label>
@@ -1086,7 +1091,7 @@
   <div id="camera-modal" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
-        <h3>Scan Barcode via Camera</h3>
+        <h3 id="camera-modal-title">Scan Barcode via Camera</h3>
         <button class="btn btn-secondary btn-icon" onclick="closeCameraScanner()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
@@ -1157,7 +1162,8 @@
         defaultLowStock: 5
       },
       currentSaleToPrint: null,
-      videoStream: null
+      videoStream: null,
+      scanTarget: 'pos' // 'pos' or target input ID (e.g. 'prod-barcode')
     };
 
     // Initialize System
@@ -1262,6 +1268,19 @@
         if (code) {
           processBarcode(code);
           barcodeInput.value = '';
+        }
+      }
+    });
+
+    // Handle Hardware Barcode Scanner in Product Add/Edit Modal
+    const prodBarcodeInput = document.getElementById('prod-barcode');
+    prodBarcodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent form auto-submit on barcode scan
+        const val = prodBarcodeInput.value.trim();
+        if (val) {
+          showToast(`Barcode Captured: ${val}`, "info");
+          document.getElementById('prod-sku').focus();
         }
       }
     });
@@ -1564,10 +1583,15 @@
       window.print();
     };
 
-    // Camera Scan Setup
-    window.openCameraScanner = async function() {
+    // Camera Scan Setup (Flexible for both POS & Product Form)
+    window.openCameraScanner = async function(target = 'pos') {
+      window.state.scanTarget = target;
       const modal = document.getElementById('camera-modal');
       const video = document.getElementById('scanner-video');
+      
+      document.getElementById('camera-modal-title').textContent = 
+        target === 'pos' ? 'Scan Barcode for Cart' : 'Scan Barcode for Product Field';
+        
       modal.classList.add('active');
 
       try {
@@ -1582,7 +1606,8 @@
             try {
               const barcodes = await detector.detect(video);
               if (barcodes.length > 0) {
-                processBarcode(barcodes[0].rawValue);
+                const code = barcodes[0].rawValue;
+                handleScannedBarcode(code);
                 closeCameraScanner();
                 return;
               }
@@ -1591,13 +1616,25 @@
           };
           scanFrame();
         } else {
-          showToast("Native Barcode Detector unsupported. USB scanner supported.", "warning");
+          showToast("Native Barcode Detector unsupported on this browser. USB/Bluetooth scanner supported.", "warning");
         }
       } catch (e) {
         showToast("Camera access denied or unavailable", "danger");
         closeCameraScanner();
       }
     };
+
+    function handleScannedBarcode(code) {
+      if (window.state.scanTarget === 'pos') {
+        processBarcode(code);
+      } else {
+        const input = document.getElementById(window.state.scanTarget);
+        if (input) {
+          input.value = code;
+          showToast(`Barcode Scanned: ${code}`, "success");
+        }
+      }
+    }
 
     window.closeCameraScanner = function() {
       if (window.state.videoStream) {
@@ -1698,6 +1735,7 @@
         document.getElementById('prod-id').value = '';
       }
       document.getElementById('product-modal').classList.add('active');
+      setTimeout(() => document.getElementById('prod-name').focus(), 100);
     };
 
     window.closeModal = function(id) {
